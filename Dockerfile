@@ -11,7 +11,8 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the PORT environment variable
-ENV PORT 8000
+ENV PORT=8000
+
 
 # Expose the port for external access
 EXPOSE 8000
