@@ -1,4 +1,4 @@
-name: Deploy Docker App to Azure
+name: Deploy to Azure Web App
 
 on:
   push:
@@ -6,31 +6,25 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.USER_NAME }}
-        password: ${{ secrets.USER_PASSWORD }}
+      - name: Setup zip file
+        run: |
+          zip -r app.zip .
 
-    - name: Build and Push Docker image
-      run: |
-        docker build -t ${{ secrets.USER_NAME }}/devops-app:${{ github.sha }} .
-        docker push ${{ secrets.USER_NAME }}/devops-app:${{ github.sha }}
+      - name: Login to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy to Azure Web App (Docker)
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: multazimdev
-        images: ${{ secrets.USER_NAME }}/devops-app:${{ github.sha }}
+      - name: Deploy ZIP package to Azure Web App
+        run: |
+          az webapp deployment source config-zip \
+            --resource-group multazim \
+            --name multazimdev \
+            --src app.zip
