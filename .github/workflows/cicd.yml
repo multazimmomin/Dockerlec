@@ -62,5 +62,5 @@ jobs:
 
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH }}
+          publish-profile: ${{ secrets.DEVEOPS }}
           images: '${{ secrets.USER_NAME }}/devops-app:${{ github.sha }}'
